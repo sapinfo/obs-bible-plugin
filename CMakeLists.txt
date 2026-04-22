@@ -67,6 +67,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   src/BiblePluginManager.cpp
   src/BiblePluginSettings.cpp
   src/BibleSource.cpp
+  src/ui/BibleWidget.cpp
 )
 
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
