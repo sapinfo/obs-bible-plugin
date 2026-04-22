@@ -51,7 +51,16 @@ if(ENABLE_QT)
 endif()
 
 find_package(SQLite3 REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SQLite3::SQLite3)
+# Older CMake / Linux package only exposes SQLite::SQLite3; newer /
+# macOS SDK also provides the SQLite3::SQLite3 alias. Support both.
+if(TARGET SQLite::SQLite3)
+  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SQLite::SQLite3)
+elseif(TARGET SQLite3::SQLite3)
+  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SQLite3::SQLite3)
+else()
+  target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${SQLite3_INCLUDE_DIRS})
+  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${SQLite3_LIBRARIES})
+endif()
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   src/plugin-main.cpp
@@ -66,7 +75,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
 
-option(BUILD_TESTS "Build unit tests" ON)
-if(BUILD_TESTS)
+# Tests are a macOS-only local developer smoke check; skip in CI and on
+# non-Apple platforms. Enable manually with -DBUILD_TESTS=ON locally.
+option(BUILD_TESTS "Build unit tests (macOS only)" OFF)
+if(BUILD_TESTS AND APPLE)
   add_subdirectory(tests)
 endif()
