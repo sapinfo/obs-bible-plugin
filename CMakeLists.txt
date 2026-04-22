@@ -36,7 +36,7 @@ if(ENABLE_QT)
 endif()
 
 find_package(SQLite3 REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SQLite::SQLite3)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SQLite3::SQLite3)
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   src/plugin-main.cpp
