@@ -54,15 +54,13 @@ static void setup_dock() {
     // QMainWindow area; otherwise OBS's saved dock visibility/geometry can't
     // be restored on next launch.
     auto *main_window = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+    if (!main_window) return;
     g_dock = new BibleDock(main_window);
     obs_frontend_add_dock_by_id("bible_dock", obs_module_text("BibleDock"), g_dock);
 }
 
 static void on_frontend_event(enum obs_frontend_event ev, void *) {
-    if (ev == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
-        BiblePluginManager::instance()->initialize();
-        setup_dock();
-    } else if (ev == OBS_FRONTEND_EVENT_EXIT) {
+    if (ev == OBS_FRONTEND_EVENT_EXIT) {
         g_dock = nullptr;
     }
 }
@@ -91,6 +89,15 @@ bool obs_module_load(void) {
     obs_frontend_add_event_callback(on_frontend_event, nullptr);
     obs_frontend_add_save_callback(on_save_or_load, nullptr);
     return true;
+}
+
+// post_load runs after the OBS main window is created but BEFORE
+// QMainWindow::restoreState() is applied, so docks registered here get
+// their saved visibility/geometry restored correctly.
+MODULE_EXPORT void obs_module_post_load(void) {
+    blog(LOG_INFO, "[obs-bible-plugin] module_post_load");
+    BiblePluginManager::instance()->initialize();
+    setup_dock();
 }
 
 void obs_module_unload(void) {
