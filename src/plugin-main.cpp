@@ -7,6 +7,7 @@
 
 #include "BiblePluginManager.h"
 #include "BiblePluginSettings.h"
+#include "BibleVerseSource.h"
 #include "ui/BibleDock.h"
 
 OBS_DECLARE_MODULE()
@@ -81,6 +82,7 @@ MODULE_EXPORT const char *obs_module_name(void) {
 
 bool obs_module_load(void) {
     blog(LOG_INFO, "[obs-bible-plugin] module_load");
+    bible_verse_source_register();
     register_hotkeys();
     obs_frontend_add_event_callback(on_frontend_event, nullptr);
     obs_frontend_add_save_callback(on_save_or_load, nullptr);

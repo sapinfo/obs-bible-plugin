@@ -59,6 +59,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   src/BiblePluginManager.cpp
   src/BiblePluginSettings.cpp
   src/BibleSource.cpp
+  src/BibleVerseSource.cpp
   src/ui/BibleDock.cpp
   src/ui/BibleWidget.cpp
 )
