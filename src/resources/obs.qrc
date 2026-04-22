@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="/res">
+  </qresource>
+  <qresource prefix="/settings">
+    <file>images/settings/general.svg</file>
+  </qresource>
+  <qresource prefix="/bible/icons">
+    <file>images/icons/prev.png</file>
+    <file>images/icons/next.png</file>
+  </qresource>
+</RCC>
