@@ -23,6 +23,29 @@ if(ENABLE_FRONTEND_API)
 endif()
 
 if(ENABLE_QT)
+  # Workaround: Qt 6.x FindWrapOpenGL on macOS 15+ SDK links -framework AGL,
+  # but AGL was removed from the SDK. Create a tiny stub AGL.framework so
+  # find_library finds it and Qt won't fall back to literal "-framework AGL".
+  if(APPLE)
+    set(_agl_stub_root "${CMAKE_BINARY_DIR}/stub_frameworks")
+    set(_agl_stub_fw   "${_agl_stub_root}/AGL.framework")
+    if(NOT EXISTS "${_agl_stub_fw}/AGL")
+      file(MAKE_DIRECTORY "${_agl_stub_fw}")
+      file(WRITE "${CMAKE_BINARY_DIR}/agl_stub.c" "void __bible_agl_stub(void) {}\n")
+      execute_process(
+        COMMAND clang -dynamiclib -arch arm64 -arch x86_64
+                -install_name "@rpath/AGL.framework/AGL"
+                -o "${_agl_stub_fw}/AGL"
+                "${CMAKE_BINARY_DIR}/agl_stub.c"
+        RESULT_VARIABLE _agl_stub_rc
+      )
+      if(NOT _agl_stub_rc EQUAL 0)
+        message(WARNING "Failed to build AGL stub; linker may fail")
+      endif()
+    endif()
+    list(PREPEND CMAKE_FRAMEWORK_PATH "${_agl_stub_root}")
+  endif()
+
   find_package(Qt6 REQUIRED COMPONENTS Widgets Core)
   target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets)
   target_compile_options(
