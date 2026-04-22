@@ -1,0 +1,14 @@
+# OBS plugin template artifacts
+.deps/
+build_macos/
+build_x64/
+build_x86_64/
+
+# Existing build directory
+build/
+
+# macOS noise
+.DS_Store
+
+# Claude/editor state
+.bkit/
