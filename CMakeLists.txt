@@ -50,37 +50,11 @@ if(ENABLE_QT)
   )
 endif()
 
-find_package(SQLite3 QUIET)
-if(NOT SQLite3_FOUND)
-  # Windows CI has no system SQLite3. Fetch the official amalgamation and
-  # build it as a static library so we don't depend on a system package.
-  message(STATUS "System SQLite3 not found; fetching amalgamation 3.46.0")
-  include(FetchContent)
-  FetchContent_Declare(
-    sqlite3_amalgamation
-    URL https://www.sqlite.org/2024/sqlite-amalgamation-3460000.zip
-    URL_HASH SHA256=712a7d09d2a22652fb06a49af516e051979a3984adb067da86760e60ed51a7f5
-  )
-  FetchContent_MakeAvailable(sqlite3_amalgamation)
-  add_library(sqlite3_bundled STATIC
-    ${sqlite3_amalgamation_SOURCE_DIR}/sqlite3.c
-  )
-  target_include_directories(sqlite3_bundled PUBLIC
-    ${sqlite3_amalgamation_SOURCE_DIR}
-  )
-  add_library(SQLite::SQLite3 ALIAS sqlite3_bundled)
-endif()
-
-# macOS SDK provides SQLite3::SQLite3 as a deprecated alias; Linux /
-# amalgamation path expose SQLite::SQLite3.
-if(TARGET SQLite::SQLite3)
-  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SQLite::SQLite3)
-elseif(TARGET SQLite3::SQLite3)
-  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SQLite3::SQLite3)
-else()
-  target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${SQLite3_INCLUDE_DIRS})
-  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${SQLite3_LIBRARIES})
-endif()
+# Vendor SQLite3 amalgamation (Public Domain) to avoid per-platform
+# packaging differences (macOS SDK vs Ubuntu libsqlite3-dev vs missing on
+# Windows runners). Compiled as part of the plugin target.
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE vendor/sqlite3)
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE vendor/sqlite3/sqlite3.c)
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   src/plugin-main.cpp

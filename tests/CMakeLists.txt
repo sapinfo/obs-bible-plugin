@@ -1,6 +1,8 @@
 find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(SQLite3 REQUIRED)
 find_package(libobs REQUIRED)
+
+# Use the same vendored SQLite3 amalgamation as the main plugin target.
+set(_bible_sqlite_dir ${CMAKE_SOURCE_DIR}/vendor/sqlite3)
 
 # Helper: apply runtime framework path so the test binary can find Qt and libobs transitive deps.
 # libobs.framework is in .deps/Frameworks. Qt6 and ffmpeg dylibs are in obs-deps*/lib.
@@ -14,7 +16,7 @@ set(BIBLE_XCODE_RPATH "${BIBLE_OBS_FW} ${BIBLE_QT_DIR} ${BIBLE_DEPS_LIB}")
 
 function(bible_add_test target)
   add_executable(${target} ${ARGN})
-  target_include_directories(${target} PRIVATE ../src)
+  target_include_directories(${target} PRIVATE ../src ${_bible_sqlite_dir})
   set_target_properties(${target} PROPERTIES
     AUTOMOC OFF
     BUILD_RPATH "${BIBLE_OBS_FW};${BIBLE_QT_DIR};${BIBLE_DEPS_LIB}"
@@ -35,8 +37,9 @@ bible_add_test(test_bible_source
   test_bible_source.cpp
   ../src/BibleSource.cpp
   ../src/BibleSearch.cpp
+  ${_bible_sqlite_dir}/sqlite3.c
 )
-target_link_libraries(test_bible_source PRIVATE Qt6::Core SQLite3::SQLite3 OBS::libobs)
+target_link_libraries(test_bible_source PRIVATE Qt6::Core OBS::libobs)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/fixture_bible.sql
                ${CMAKE_CURRENT_BINARY_DIR}/fixture_bible.sql COPYONLY)
