@@ -64,6 +64,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SQLite3::SQLite3)
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   src/plugin-main.cpp
   src/BibleSearch.cpp
+  src/BiblePluginSettings.cpp
   src/BibleSource.cpp
 )
 
