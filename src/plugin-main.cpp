@@ -50,7 +50,11 @@ static void unregister_hotkeys() {
 
 static void setup_dock() {
     if (g_dock) return;
-    g_dock = new BibleDock();
+    // Parent must be the OBS main window so QDockWidget integrates with its
+    // QMainWindow area; otherwise OBS's saved dock visibility/geometry can't
+    // be restored on next launch.
+    auto *main_window = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+    g_dock = new BibleDock(main_window);
     obs_frontend_add_dock_by_id("bible_dock", obs_module_text("BibleDock"), g_dock);
 }
 
