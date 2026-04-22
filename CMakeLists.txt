@@ -59,7 +59,7 @@ if(NOT SQLite3_FOUND)
   FetchContent_Declare(
     sqlite3_amalgamation
     URL https://www.sqlite.org/2024/sqlite-amalgamation-3460000.zip
-    URL_HASH SHA256=712a7d09d2a22652fb06fc4b4e3d885b10c042e0004cc16d7a378d5304c75b40
+    URL_HASH SHA256=712a7d09d2a22652fb06a49af516e051979a3984adb067da86760e60ed51a7f5
   )
   FetchContent_MakeAvailable(sqlite3_amalgamation)
   add_library(sqlite3_bundled STATIC
